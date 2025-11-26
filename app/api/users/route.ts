@@ -51,3 +51,32 @@ export async function GET() {
     timestamp: new Date().toISOString()
   });
 }
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    
+    // Mock 응답 - 실제로는 요청 데이터를 사용하여 새 사용자 생성
+    const newUser = {
+      id: Math.floor(Math.random() * 10000) + 100,
+      name: body.name || '새 사용자',
+      email: body.email || 'user@example.com',
+      role: body.role || 'user',
+      avatar: body.avatar || `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70)}`,
+      createdAt: new Date().toISOString()
+    };
+
+    return NextResponse.json({
+      success: true,
+      message: '사용자가 성공적으로 생성되었습니다.',
+      data: newUser,
+      timestamp: new Date().toISOString()
+    }, { status: 201 });
+  } catch (error) {
+    return NextResponse.json({
+      success: false,
+      message: '요청 처리 중 오류가 발생했습니다.',
+      error: 'Invalid JSON'
+    }, { status: 400 });
+  }
+}

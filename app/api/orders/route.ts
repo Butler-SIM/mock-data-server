@@ -148,3 +148,54 @@ export async function GET() {
     timestamp: new Date().toISOString()
   });
 }
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    
+    // Mock 응답 - 실제로는 요청 데이터를 사용하여 새 주문 생성
+    const orderId = `ORD-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
+    const items = body.items || [];
+    const subtotal = items.reduce((sum: number, item: any) => sum + (item.price || 0) * (item.quantity || 1), 0);
+    const shipping = body.shipping || (subtotal > 100000 ? 0 : 3000);
+    const tax = Math.floor(subtotal * 0.1);
+    const total = subtotal + shipping + tax;
+
+    const newOrder = {
+      id: orderId,
+      userId: body.userId || 1,
+      userName: body.userName || '고객',
+      status: 'processing',
+      items: items,
+      subtotal: subtotal,
+      shipping: shipping,
+      tax: tax,
+      total: total,
+      currency: body.currency || 'KRW',
+      shippingAddress: body.shippingAddress || {
+        name: '고객',
+        phone: '010-0000-0000',
+        address: '주소를 입력해주세요',
+        zipCode: '00000'
+      },
+      paymentMethod: body.paymentMethod || 'credit_card',
+      paymentStatus: 'pending',
+      trackingNumber: null,
+      createdAt: new Date().toISOString(),
+      deliveredAt: null
+    };
+
+    return NextResponse.json({
+      success: true,
+      message: '주문이 성공적으로 생성되었습니다.',
+      data: newOrder,
+      timestamp: new Date().toISOString()
+    }, { status: 201 });
+  } catch (error) {
+    return NextResponse.json({
+      success: false,
+      message: '요청 처리 중 오류가 발생했습니다.',
+      error: 'Invalid JSON'
+    }, { status: 400 });
+  }
+}

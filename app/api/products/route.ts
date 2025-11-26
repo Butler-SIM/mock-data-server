@@ -102,3 +102,40 @@ export async function GET() {
     timestamp: new Date().toISOString()
   });
 }
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    
+    // Mock 응답 - 실제로는 요청 데이터를 사용하여 새 상품 생성
+    const newProduct = {
+      id: Math.floor(Math.random() * 10000) + 100,
+      name: body.name || '새 상품',
+      description: body.description || '상품 설명',
+      price: body.price || 0,
+      originalPrice: body.originalPrice || body.price || 0,
+      currency: body.currency || 'KRW',
+      category: body.category || 'general',
+      brand: body.brand || 'Unknown',
+      rating: 0,
+      reviewCount: 0,
+      stock: body.stock || 0,
+      inStock: (body.stock || 0) > 0,
+      images: body.images || ['https://picsum.photos/400/400?random=' + Math.floor(Math.random() * 100)],
+      tags: body.tags || []
+    };
+
+    return NextResponse.json({
+      success: true,
+      message: '상품이 성공적으로 생성되었습니다.',
+      data: newProduct,
+      timestamp: new Date().toISOString()
+    }, { status: 201 });
+  } catch (error) {
+    return NextResponse.json({
+      success: false,
+      message: '요청 처리 중 오류가 발생했습니다.',
+      error: 'Invalid JSON'
+    }, { status: 400 });
+  }
+}

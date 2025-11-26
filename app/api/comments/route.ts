@@ -83,3 +83,36 @@ export async function GET() {
     timestamp: new Date().toISOString()
   });
 }
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    
+    // Mock 응답 - 실제로는 요청 데이터를 사용하여 새 댓글 생성
+    const newComment = {
+      id: Math.floor(Math.random() * 10000) + 100,
+      postId: body.postId || 1,
+      userId: body.userId || 1,
+      userName: body.userName || '익명',
+      userAvatar: body.userAvatar || `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70)}`,
+      content: body.content || '댓글 내용',
+      likes: 0,
+      replies: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    return NextResponse.json({
+      success: true,
+      message: '댓글이 성공적으로 생성되었습니다.',
+      data: newComment,
+      timestamp: new Date().toISOString()
+    }, { status: 201 });
+  } catch (error) {
+    return NextResponse.json({
+      success: false,
+      message: '요청 처리 중 오류가 발생했습니다.',
+      error: 'Invalid JSON'
+    }, { status: 400 });
+  }
+}

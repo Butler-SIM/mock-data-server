@@ -81,3 +81,38 @@ export async function GET() {
     timestamp: new Date().toISOString()
   });
 }
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    
+    // Mock 응답 - 실제로는 요청 데이터를 사용하여 새 게시글 생성
+    const newPost = {
+      id: Math.floor(Math.random() * 10000) + 100,
+      title: body.title || '새 게시글',
+      content: body.content || '게시글 내용',
+      author: body.author || '익명',
+      authorId: body.authorId || 1,
+      category: body.category || 'general',
+      tags: body.tags || [],
+      likes: 0,
+      views: 0,
+      published: body.published !== undefined ? body.published : true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    return NextResponse.json({
+      success: true,
+      message: '게시글이 성공적으로 생성되었습니다.',
+      data: newPost,
+      timestamp: new Date().toISOString()
+    }, { status: 201 });
+  } catch (error) {
+    return NextResponse.json({
+      success: false,
+      message: '요청 처리 중 오류가 발생했습니다.',
+      error: 'Invalid JSON'
+    }, { status: 400 });
+  }
+}

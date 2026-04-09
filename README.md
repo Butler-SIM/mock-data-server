@@ -187,6 +187,97 @@ GET /api/orders
 
 **포함 데이터:** 주문 ID, 주문 상태, 주문 상품, 가격 정보, 배송 주소, 결제 정보, 추적 번호
 
+## 에러 시뮬레이션 API
+
+### 전용 에러 엔드포인트
+
+원하는 HTTP 에러 코드를 직접 반환하는 엔드포인트입니다.
+
+```
+GET /api/errors/{code}
+POST /api/errors/{code}
+PUT /api/errors/{code}
+DELETE /api/errors/{code}
+PATCH /api/errors/{code}
+```
+
+**지원 에러 코드:**
+
+| 코드 | 메시지 | 설명 | 특이사항 |
+|------|--------|------|----------|
+| 400 | Bad Request | 잘못된 요청 | - |
+| 401 | Unauthorized | 인증 필요 | `authType`, `realm` 포함 |
+| 403 | Forbidden | 접근 권한 없음 | - |
+| 404 | Not Found | 리소스 없음 | - |
+| 405 | Method Not Allowed | 허용되지 않은 메서드 | - |
+| 408 | Request Timeout | 요청 시간 초과 | - |
+| 409 | Conflict | 리소스 충돌 | - |
+| 413 | Payload Too Large | 요청 본문 초과 | - |
+| 422 | Unprocessable Entity | 유효성 검사 실패 | `validationErrors` 배열 포함 |
+| 429 | Too Many Requests | Rate Limit 초과 | `Retry-After` 헤더, `rateLimit` 정보 포함 |
+| 500 | Internal Server Error | 서버 내부 오류 | - |
+| 502 | Bad Gateway | 업스트림 서버 오류 | - |
+| 503 | Service Unavailable | 서비스 일시 중단 | - |
+| 504 | Gateway Timeout | 게이트웨이 타임아웃 | - |
+
+**Query Parameters:**
+- `delay`: 응답 지연 시간 ms (예: `?delay=3000`)
+- `message`: 커스텀 에러 메시지 (예: `?message=Custom+Error`)
+
+**예시:**
+```bash
+# 500 에러
+GET /api/errors/500
+
+# 3초 딜레이 후 503 에러
+GET /api/errors/503?delay=3000
+
+# 커스텀 메시지
+GET /api/errors/400?message=잘못된+파라미터
+```
+
+### 기존 API 에러 시뮬레이션 (쿼리 파라미터)
+
+모든 기존 API 엔드포인트에 아래 쿼리 파라미터를 추가하여 에러를 시뮬레이션할 수 있습니다.
+
+| 파라미터 | 설명 | 예시 |
+|----------|------|------|
+| `_error` | 지정된 HTTP 에러 코드 반환 | `?_error=500` |
+| `_delay` | 응답 지연 시간 (밀리초) | `?_delay=3000` |
+| `_timeout` | 타임아웃 시뮬레이션 (30초 대기 후 504) | `?_timeout=true` |
+| `_random_error` | 랜덤 확률로 에러 발생 (0-100) | `?_random_error=30` |
+
+**예시:**
+```bash
+# 기존 API에서 500 에러 시뮬레이션
+GET /api/users?_error=500
+
+# 3초 딜레이 후 정상 응답
+GET /api/users?_delay=3000
+
+# 2초 딜레이 후 503 에러
+GET /api/users?_delay=2000&_error=503
+
+# 30% 확률로 랜덤 에러
+GET /api/orders?_random_error=30
+
+# 타임아웃 시뮬레이션
+GET /api/products?_timeout=true
+```
+
+**에러 응답 형식:**
+```json
+{
+  "success": false,
+  "error": {
+    "code": 500,
+    "message": "Internal Server Error",
+    "description": "서버 내부 오류가 발생했습니다.",
+    "timestamp": "2024-11-07T10:30:00Z"
+  }
+}
+```
+
 ## 사용 예시
 
 ### JavaScript / TypeScript

@@ -1,6 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { withErrorSimulation } from '../_lib/errorSimulator';
 
-export async function GET() {
+async function handleGet(request: NextRequest) {
   const orders = [
     {
       id: 'ORD-2024-001',
@@ -149,11 +150,10 @@ export async function GET() {
   });
 }
 
-export async function POST(request: Request) {
+async function handlePost(request: NextRequest) {
   try {
     const body = await request.json();
     
-    // Mock 응답 - 실제로는 요청 데이터를 사용하여 새 주문 생성
     const orderId = `ORD-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
     const items = body.items || [];
     const subtotal = items.reduce((sum: number, item: any) => sum + (item.price || 0) * (item.quantity || 1), 0);
@@ -199,3 +199,6 @@ export async function POST(request: Request) {
     }, { status: 400 });
   }
 }
+
+export const GET = withErrorSimulation(handleGet);
+export const POST = withErrorSimulation(handlePost);

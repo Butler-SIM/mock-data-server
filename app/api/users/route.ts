@@ -1,6 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { withErrorSimulation } from '../_lib/errorSimulator';
 
-export async function GET() {
+async function handleGet(request: NextRequest) {
   const users = [
     {
       id: 1,
@@ -52,11 +53,10 @@ export async function GET() {
   });
 }
 
-export async function POST(request: Request) {
+async function handlePost(request: NextRequest) {
   try {
     const body = await request.json();
     
-    // Mock 응답 - 실제로는 요청 데이터를 사용하여 새 사용자 생성
     const newUser = {
       id: Math.floor(Math.random() * 10000) + 100,
       name: body.name || '새 사용자',
@@ -80,3 +80,6 @@ export async function POST(request: Request) {
     }, { status: 400 });
   }
 }
+
+export const GET = withErrorSimulation(handleGet);
+export const POST = withErrorSimulation(handlePost);

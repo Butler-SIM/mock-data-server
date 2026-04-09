@@ -1,6 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { withErrorSimulation } from '../_lib/errorSimulator';
 
-export async function GET() {
+async function handleGet(request: NextRequest) {
   const settings = {
     general: {
       siteName: 'My Application',
@@ -75,3 +76,5 @@ export async function GET() {
     version: '1.0.0'
   });
 }
+
+export const GET = withErrorSimulation(handleGet);

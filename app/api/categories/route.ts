@@ -1,6 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { withErrorSimulation } from '../_lib/errorSimulator';
 
-export async function GET() {
+async function handleGet(request: NextRequest) {
   const categories = [
     {
       id: 1,
@@ -96,3 +97,5 @@ export async function GET() {
     timestamp: new Date().toISOString()
   });
 }
+
+export const GET = withErrorSimulation(handleGet);

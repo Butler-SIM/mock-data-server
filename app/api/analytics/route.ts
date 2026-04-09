@@ -1,6 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { withErrorSimulation } from '../_lib/errorSimulator';
 
-export async function GET() {
+async function handleGet(request: NextRequest) {
   const analytics = {
     overview: {
       totalUsers: 15234,
@@ -56,3 +57,5 @@ export async function GET() {
     period: 'last_7_days'
   });
 }
+
+export const GET = withErrorSimulation(handleGet);
